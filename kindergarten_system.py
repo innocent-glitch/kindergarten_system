@@ -1,30 +1,20 @@
-"""
-Abel's Little Learners Kindergarten - Fixed Version
-All functions properly passed to templates
-"""
-
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from datetime import date
 import os
+import sys
 
 app = Flask(__name__)
-app.secret_key = 'abel_kindergarten_secret'
-
-
-# ==================== HELPER FUNCTIONS ====================
+app.secret_key = os.environ.get('SECRET_KEY', 'abel_kindergarten_secret')
 
 def get_attendance_percentage(student):
-    """Calculate attendance percentage for a student"""
     if not student.get('attendance'):
         return 0
     present = sum(1 for a in student['attendance'] if a['status'] == "Present")
+    if len(student['attendance']) == 0:
+        return 0
     return (present / len(student['attendance'])) * 100
 
-
-# Register the function as a Jinja filter
 app.jinja_env.globals.update(get_attendance_percentage=get_attendance_percentage)
-
-# ==================== DATA STORAGE ====================
 
 students = []
 teachers = []
@@ -32,68 +22,11 @@ classrooms = []
 student_counter = 1
 teacher_counter = 1
 
-
-def init_data():
-    global students, teachers, classrooms, student_counter, teacher_counter
-
-    # Classrooms
-    classrooms = [
-        {"name": "Sunshine Stars", "capacity": 15, "teacher": "", "students": [], "schedule": {}},
-        {"name": "Rainbow Garden", "capacity": 12, "teacher": "", "students": [], "schedule": {}},
-        {"name": "Little Angels", "capacity": 10, "teacher": "", "students": [], "schedule": {}}
-    ]
-
-    # Teachers
-    teachers = [
-        {"id": "T0001", "name": "Ms. Grace", "age": 35, "contact": "555-0101", "subject": "Art", "classroom": ""},
-        {"id": "T0002", "name": "Mr. Wisdom", "age": 42, "contact": "555-0102", "subject": "Math", "classroom": ""},
-        {"id": "T0003", "name": "Ms. Joy", "age": 28, "contact": "555-0103", "subject": "Reading", "classroom": ""}
-    ]
-    teacher_counter = 4
-
-    # Students
-    student_data = [
-        ("Emma", 5, "555-1001", "Mr. & Mrs. Wilson"),
-        ("Liam", 4, "555-1002", "Mr. & Mrs. Brown"),
-        ("Sophia", 5, "555-1003", "Ms. Martinez"),
-        ("Noah", 4, "555-1004", "Mr. & Mrs. Taylor"),
-        ("Olivia", 5, "555-1005", "Dr. & Dr. Anderson"),
-        ("Mason", 4, "555-1006", "Mr. & Mrs. Thomas")
-    ]
-
-    students = []
-    for i, (name, age, contact, parent) in enumerate(student_data, 1):
-        students.append({
-            "id": f"S{i:04d}",
-            "name": name,
-            "age": age,
-            "contact": contact,
-            "parent": parent,
-            "classroom": "",
-            "attendance": []
-        })
-    student_counter = 7
-
-    # Assign some students to classrooms
-    assign_student("Emma", "Sunshine Stars")
-    assign_student("Liam", "Sunshine Stars")
-    assign_student("Sophia", "Rainbow Garden")
-    assign_student("Noah", "Rainbow Garden")
-    assign_student("Olivia", "Little Angels")
-    assign_student("Mason", "Little Angels")
-
-    # Assign teachers
-    assign_teacher("Ms. Grace", "Sunshine Stars")
-    assign_teacher("Mr. Wisdom", "Rainbow Garden")
-    assign_teacher("Ms. Joy", "Little Angels")
-
-
 def find_student(name):
     for s in students:
         if s['name'].lower() == name.lower():
             return s
     return None
-
 
 def find_teacher(name):
     for t in teachers:
@@ -101,13 +34,11 @@ def find_teacher(name):
             return t
     return None
 
-
 def find_classroom(name):
     for c in classrooms:
         if c['name'].lower() == name.lower():
             return c
     return None
-
 
 def assign_student(student_name, class_name):
     student = find_student(student_name)
@@ -119,7 +50,6 @@ def assign_student(student_name, class_name):
             return True
     return False
 
-
 def assign_teacher(teacher_name, class_name):
     teacher = find_teacher(teacher_name)
     classroom = find_classroom(class_name)
@@ -129,7 +59,6 @@ def assign_teacher(teacher_name, class_name):
         return True
     return False
 
-
 def mark_attendance(student_name, status="Present"):
     student = find_student(student_name)
     if student:
@@ -137,12 +66,6 @@ def mark_attendance(student_name, status="Present"):
         student['attendance'].append({"date": today, "status": status})
         return True
     return False
-
-
-init_data()
-
-
-# ==================== FLASK ROUTES ====================
 
 @app.route('/')
 def index():
@@ -153,13 +76,11 @@ def index():
                            system_name="Abel's Little Learners",
                            get_attendance_percentage=get_attendance_percentage)
 
-
 @app.route('/students')
 def view_students():
     return render_template('students.html',
                            students=students,
                            get_attendance_percentage=get_attendance_percentage)
-
 
 @app.route('/students/add', methods=['GET', 'POST'])
 def add_student():
@@ -186,7 +107,6 @@ def add_student():
         flash('All fields are required!', 'danger')
     return render_template('add_student.html')
 
-
 @app.route('/students/attendance', methods=['POST'])
 def attendance():
     name = request.form.get('student_name')
@@ -196,7 +116,6 @@ def attendance():
     else:
         flash('Student not found!', 'danger')
     return redirect(url_for('view_students'))
-
 
 @app.route('/students/<student_id>')
 def student_detail(student_id):
@@ -208,11 +127,9 @@ def student_detail(student_id):
     flash('Student not found!', 'danger')
     return redirect(url_for('view_students'))
 
-
 @app.route('/teachers')
 def view_teachers():
     return render_template('teachers.html', teachers=teachers)
-
 
 @app.route('/teachers/add', methods=['GET', 'POST'])
 def add_teacher():
@@ -238,11 +155,9 @@ def add_teacher():
         flash('All fields are required!', 'danger')
     return render_template('add_teacher.html')
 
-
 @app.route('/classrooms')
 def view_classrooms():
     return render_template('classrooms.html', classrooms=classrooms)
-
 
 @app.route('/classrooms/add', methods=['GET', 'POST'])
 def add_classroom():
@@ -263,7 +178,6 @@ def add_classroom():
         flash('All fields are required!', 'danger')
     return render_template('add_classroom.html')
 
-
 @app.route('/assign/student', methods=['GET', 'POST'])
 def assign_student_view():
     if request.method == 'POST':
@@ -279,7 +193,6 @@ def assign_student_view():
     return render_template('assign_student.html',
                            students=unassigned,
                            classrooms=classrooms)
-
 
 @app.route('/assign/teacher', methods=['GET', 'POST'])
 def assign_teacher_view():
@@ -297,7 +210,6 @@ def assign_teacher_view():
                            teachers=unassigned,
                            classrooms=classrooms)
 
-
 @app.route('/classrooms/<classroom_name>')
 def classroom_detail(classroom_name):
     classroom = find_classroom(classroom_name)
@@ -309,9 +221,6 @@ def classroom_detail(classroom_name):
     flash('Classroom not found!', 'danger')
     return redirect(url_for('view_classrooms'))
 
-
-# ==================== API ENDPOINTS ====================
-
 @app.route('/api/data')
 def api_data():
     return jsonify({
@@ -320,31 +229,24 @@ def api_data():
         "classrooms": classrooms
     })
 
-
 @app.route('/api/students')
 def api_students():
     return jsonify(students)
-
 
 @app.route('/api/teachers')
 def api_teachers():
     return jsonify(teachers)
 
-
 @app.route('/api/classrooms')
 def api_classrooms():
     return jsonify(classrooms)
 
-
-# ==================== CREATE TEMPLATES ====================
-
 def create_templates():
-    """Create all HTML templates"""
-    if not os.path.exists('templates'):
-        os.makedirs('templates')
+    template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+    if not os.path.exists(template_dir):
+        os.makedirs(template_dir)
 
-    # Base template
-    with open('templates/base.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'base.html'), 'w', encoding='utf-8') as f:
         f.write('''<!DOCTYPE html>
 <html>
 <head>
@@ -422,8 +324,7 @@ def create_templates():
 </html>
 ''')
 
-    # Dashboard
-    with open('templates/index.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'index.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -500,8 +401,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Students page
-    with open('templates/students.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'students.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mt-4">
@@ -552,7 +452,6 @@ def create_templates():
                             </a>
                         </td>
                     </tr>
-                    <!-- Attendance Modal -->
                     <div class="modal fade" id="attendanceModal{{ s.id }}" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -588,8 +487,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Add student form
-    with open('templates/add_student.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'add_student.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -626,8 +524,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Teachers page
-    with open('templates/teachers.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'teachers.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mt-4">
@@ -673,8 +570,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Add teacher form
-    with open('templates/add_teacher.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'add_teacher.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -711,8 +607,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Classrooms page
-    with open('templates/classrooms.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'classrooms.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mt-4">
@@ -748,8 +643,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Add classroom form
-    with open('templates/add_classroom.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'add_classroom.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -779,8 +673,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Assign student
-    with open('templates/assign_student.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'assign_student.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -828,8 +721,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Assign teacher
-    with open('templates/assign_teacher.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'assign_teacher.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -877,8 +769,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Student detail
-    with open('templates/student_detail.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'student_detail.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -943,8 +834,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    # Classroom detail
-    with open('templates/classroom_detail.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'classroom_detail.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -978,15 +868,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-
-# ==================== RUN ====================
-
 if __name__ == '__main__':
     create_templates()
-    print("\n" + "=" * 50)
-    print("🌸 Abel's Little Learners Kindergarten 🌸")
-    print("=" * 50)
-    print("📱 Web Interface: http://127.0.0.1:5000")
-    print("💕 Pink & Skyblue Theme")
-    print("=" * 50)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
