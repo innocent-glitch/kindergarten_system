@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from datetime import date
 import os
+import sys
 
 app = Flask(__name__)
 app.secret_key = 'abel_kindergarten_secret'
@@ -9,6 +10,8 @@ def get_attendance_percentage(student):
     if not student.get('attendance'):
         return 0
     present = sum(1 for a in student['attendance'] if a['status'] == "Present")
+    if len(student['attendance']) == 0:
+        return 0
     return (present / len(student['attendance'])) * 100
 
 app.jinja_env.globals.update(get_attendance_percentage=get_attendance_percentage)
@@ -239,10 +242,11 @@ def api_classrooms():
     return jsonify(classrooms)
 
 def create_templates():
-    if not os.path.exists('templates'):
-        os.makedirs('templates')
+    template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+    if not os.path.exists(template_dir):
+        os.makedirs(template_dir)
 
-    with open('templates/base.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'base.html'), 'w', encoding='utf-8') as f:
         f.write('''<!DOCTYPE html>
 <html>
 <head>
@@ -273,6 +277,24 @@ def create_templates():
         .badge-sky { background: #87CEEB; color: white; }
         .flash-messages { margin-top: 20px; }
         .main-content { min-height: 70vh; }
+        .btn-outline-primary {
+            border-color: #FF69B4;
+            color: #FF69B4;
+        }
+        .btn-outline-primary:hover {
+            background: var(--gradient);
+            color: white;
+            border-color: transparent;
+        }
+        .btn-outline-success {
+            border-color: #87CEEB;
+            color: #87CEEB;
+        }
+        .btn-outline-success:hover {
+            background: var(--gradient);
+            color: white;
+            border-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -320,7 +342,7 @@ def create_templates():
 </html>
 ''')
 
-    with open('templates/index.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'index.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -372,10 +394,10 @@ def create_templates():
             <div class="card-body">
                 <div class="d-grid gap-2">
                     <a href="/students/add" class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> Add Student</a>
-                    <a href="/teachers/add" class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> Add Teacher</a>
+                    <a href="/teachers/add" class="btn btn-outline-success"><i class="bi bi-person-plus"></i> Add Teacher</a>
                     <a href="/classrooms/add" class="btn btn-outline-primary"><i class="bi bi-building-add"></i> Create Classroom</a>
                     <a href="/assign/student" class="btn btn-outline-primary"><i class="bi bi-arrow-right-circle"></i> Assign Student</a>
-                    <a href="/assign/teacher" class="btn btn-outline-primary"><i class="bi bi-arrow-right-circle"></i> Assign Teacher</a>
+                    <a href="/assign/teacher" class="btn btn-outline-success"><i class="bi bi-arrow-right-circle"></i> Assign Teacher</a>
                 </div>
             </div>
         </div>
@@ -397,7 +419,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/students.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'students.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mt-4">
@@ -483,7 +505,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/add_student.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'add_student.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -520,7 +542,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/teachers.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'teachers.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mt-4">
@@ -566,7 +588,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/add_teacher.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'add_teacher.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -603,7 +625,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/classrooms.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'classrooms.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mt-4">
@@ -631,7 +653,7 @@ def create_templates():
             <div class="card-header"><i class="bi bi-arrow-right-circle"></i> Assignments</div>
             <div class="card-body">
                 <a href="/assign/student" class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> Assign Student</a>
-                <a href="/assign/teacher" class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> Assign Teacher</a>
+                <a href="/assign/teacher" class="btn btn-outline-success"><i class="bi bi-person-plus"></i> Assign Teacher</a>
             </div>
         </div>
     </div>
@@ -639,7 +661,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/add_classroom.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'add_classroom.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -669,7 +691,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/assign_student.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'assign_student.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -717,7 +739,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/assign_teacher.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'assign_teacher.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -765,7 +787,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/student_detail.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'student_detail.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -830,7 +852,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open('templates/classroom_detail.html', 'w', encoding='utf-8') as f:
+    with open(os.path.join(template_dir, 'classroom_detail.html'), 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -866,10 +888,5 @@ def create_templates():
 
 if __name__ == '__main__':
     create_templates()
-    print("\n" + "=" * 50)
-    print("🌸 Abel's Little Learners Kindergarten 🌸")
-    print("=" * 50)
-    print("📱 Web Interface: http://127.0.0.1:5000")
-    print("💕 Pink & Skyblue Theme")
-    print("=" * 50)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
