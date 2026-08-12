@@ -1,0 +1,1 @@
+web: gunicorn kindergarten_system:app
