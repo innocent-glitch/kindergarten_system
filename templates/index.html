@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <h1 class="display-4" style="background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <i class="bi bi-heart-fill" style="color: #FF69B4;"></i> Welcome to Abel's Little Learners
+        </h1>
+        <p class="lead">Where every child's journey begins with love and care.</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-people" style="font-size: 3rem; color: #FF69B4;"></i>
+                <h3 class="stat-number">{{ students|length }}</h3>
+                <h5>Students</h5>
+                <a href="/students" class="btn btn-primary btn-sm">View All</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-person-badge" style="font-size: 3rem; color: #87CEEB;"></i>
+                <h3 class="stat-number">{{ teachers|length }}</h3>
+                <h5>Teachers</h5>
+                <a href="/teachers" class="btn btn-primary btn-sm">View All</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-building" style="font-size: 3rem; color: #FF1493;"></i>
+                <h3 class="stat-number">{{ classrooms|length }}</h3>
+                <h5>Classrooms</h5>
+                <a href="/classrooms" class="btn btn-primary btn-sm">View All</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-clock-history"></i> Quick Actions</div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/students/add" class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> Add Student</a>
+                    <a href="/teachers/add" class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> Add Teacher</a>
+                    <a href="/classrooms/add" class="btn btn-outline-primary"><i class="bi bi-building-add"></i> Create Classroom</a>
+                    <a href="/assign/student" class="btn btn-outline-primary"><i class="bi bi-arrow-right-circle"></i> Assign Student</a>
+                    <a href="/assign/teacher" class="btn btn-outline-primary"><i class="bi bi-arrow-right-circle"></i> Assign Teacher</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-info-circle"></i> Quick Stats</div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item"><i class="bi bi-check-circle text-success"></i> System running</li>
+                    <li class="list-group-item"><i class="bi bi-people text-primary"></i> {{ students|length }} students enrolled</li>
+                    <li class="list-group-item"><i class="bi bi-person-badge text-info"></i> {{ teachers|length }} teachers</li>
+                    <li class="list-group-item"><i class="bi bi-building text-danger"></i> {{ classrooms|length }} classrooms</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

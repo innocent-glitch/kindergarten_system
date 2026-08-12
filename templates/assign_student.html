@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-arrow-right-circle"></i> Assign Student to Classroom</div>
+            <div class="card-body">
+                {% if students and classrooms %}
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Student <span class="text-danger">*</span></label>
+                        <select class="form-select" name="student_name" required>
+                            <option value="">Select Student</option>
+                            {% for s in students %}
+                                <option value="{{ s.name }}">{{ s.name }} ({{ s.id }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Classroom <span class="text-danger">*</span></label>
+                        <select class="form-select" name="class_name" required>
+                            <option value="">Select Classroom</option>
+                            {% for c in classrooms %}
+                                <option value="{{ c.name }}">{{ c.name }} ({{ c.students|length }}/{{ c.capacity }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Assign</button>
+                        <a href="/classrooms" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-info-circle" style="font-size: 3rem; color: #FFD700;"></i>
+                    <p>No students or classrooms available to assign.</p>
+                    <a href="/students/add" class="btn btn-primary btn-sm">Add Student</a>
+                    <a href="/classrooms/add" class="btn btn-outline-primary btn-sm">Create Classroom</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

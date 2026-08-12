@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-building"></i> Classroom Details</div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ classroom.name }}</p>
+                <p><strong>Capacity:</strong> <span class="badge badge-pink">{{ classroom.students|length }}/{{ classroom.capacity }}</span></p>
+                <p><strong>Teacher:</strong> {{ classroom.teacher or "Not assigned" }}</p>
+                <hr>
+                <h5>Students in this Classroom</h5>
+                {% if classroom.students %}
+                <ul class="list-group">
+                    {% for s in classroom.students %}
+                    <li class="list-group-item">
+                        <i class="bi bi-person"></i> {{ s }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No students assigned to this classroom.</p>
+                {% endif %}
+                <div class="d-grid gap-2 mt-3">
+                    <a href="/classrooms" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Classrooms</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

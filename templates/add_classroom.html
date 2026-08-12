@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-building-add"></i> Create Classroom</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Classroom Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" placeholder="e.g., Sunshine Stars" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Capacity <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="capacity" min="5" max="30" required>
+                        <small class="text-muted">Minimum 5, Maximum 30 students</small>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Create</button>
+                        <a href="/classrooms" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
