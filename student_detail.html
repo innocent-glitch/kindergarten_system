@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-person"></i> Student Details</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>ID:</strong> {{ student.id }}</p>
+                        <p><strong>Name:</strong> {{ student.name }}</p>
+                        <p><strong>Age:</strong> {{ student.age }}</p>
+                        <p><strong>Parent:</strong> {{ student.parent }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Contact:</strong> {{ student.contact }}</p>
+                        <p><strong>Classroom:</strong> {{ student.classroom or "Not assigned" }}</p>
+                        <p><strong>Attendance:</strong> 
+                            {% set att = get_attendance_percentage(student) %}
+                            <span class="badge bg-{% if att >= 80 %}success{% elif att >= 50 %}warning{% else %}danger{% endif %}">
+                                {{ "%.1f"|format(att) }}%
+                            </span>
+                        </p>
+                        <p><strong>Total Days:</strong> {{ student.attendance|length }}</p>
+                    </div>
+                </div>
+                <hr>
+                <h5>Attendance Records</h5>
+                {% if student.attendance %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in student.attendance %}
+                            <tr>
+                                <td>{{ a.date }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if a.status == 'Present' else 'danger' }}">
+                                        {{ a.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No attendance records yet.</p>
+                {% endif %}
+                <div class="d-grid gap-2 mt-3">
+                    <a href="/students" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Students</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
