@@ -1,17 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from datetime import date
 import os
-import sys
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'abel_kindergarten_secret')
+app.secret_key = 'abel_kindergarten_secret'
 
 def get_attendance_percentage(student):
     if not student.get('attendance'):
         return 0
     present = sum(1 for a in student['attendance'] if a['status'] == "Present")
-    if len(student['attendance']) == 0:
-        return 0
     return (present / len(student['attendance'])) * 100
 
 app.jinja_env.globals.update(get_attendance_percentage=get_attendance_percentage)
@@ -242,11 +239,10 @@ def api_classrooms():
     return jsonify(classrooms)
 
 def create_templates():
-    template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-    if not os.path.exists(template_dir):
-        os.makedirs(template_dir)
+    if not os.path.exists('templates'):
+        os.makedirs('templates')
 
-    with open(os.path.join(template_dir, 'base.html'), 'w', encoding='utf-8') as f:
+    with open('templates/base.html', 'w', encoding='utf-8') as f:
         f.write('''<!DOCTYPE html>
 <html>
 <head>
@@ -324,7 +320,7 @@ def create_templates():
 </html>
 ''')
 
-    with open(os.path.join(template_dir, 'index.html'), 'w', encoding='utf-8') as f:
+    with open('templates/index.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -401,7 +397,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'students.html'), 'w', encoding='utf-8') as f:
+    with open('templates/students.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mt-4">
@@ -487,7 +483,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'add_student.html'), 'w', encoding='utf-8') as f:
+    with open('templates/add_student.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -524,7 +520,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'teachers.html'), 'w', encoding='utf-8') as f:
+    with open('templates/teachers.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mt-4">
@@ -570,7 +566,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'add_teacher.html'), 'w', encoding='utf-8') as f:
+    with open('templates/add_teacher.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -607,7 +603,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'classrooms.html'), 'w', encoding='utf-8') as f:
+    with open('templates/classrooms.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mt-4">
@@ -643,7 +639,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'add_classroom.html'), 'w', encoding='utf-8') as f:
+    with open('templates/add_classroom.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -673,7 +669,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'assign_student.html'), 'w', encoding='utf-8') as f:
+    with open('templates/assign_student.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -721,7 +717,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'assign_teacher.html'), 'w', encoding='utf-8') as f:
+    with open('templates/assign_teacher.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -769,7 +765,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'student_detail.html'), 'w', encoding='utf-8') as f:
+    with open('templates/student_detail.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -834,7 +830,7 @@ def create_templates():
 {% endblock %}
 ''')
 
-    with open(os.path.join(template_dir, 'classroom_detail.html'), 'w', encoding='utf-8') as f:
+    with open('templates/classroom_detail.html', 'w', encoding='utf-8') as f:
         f.write('''{% extends "base.html" %}
 {% block content %}
 <div class="row mt-4">
@@ -870,5 +866,10 @@ def create_templates():
 
 if __name__ == '__main__':
     create_templates()
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    print("\n" + "=" * 50)
+    print("🌸 Abel's Little Learners Kindergarten 🌸")
+    print("=" * 50)
+    print("📱 Web Interface: http://127.0.0.1:5000")
+    print("💕 Pink & Skyblue Theme")
+    print("=" * 50)
+    app.run(debug=True, host='0.0.0.0', port=5000)
